@@ -157,6 +157,12 @@ public abstract class AbstractManagedType<J>
 			return attribute;
 		}
 
+		// then look at declared concrete genric attribute
+		final PersistentAttribute<? super J, ?> genericAttribute = findConcreteGenericAttribute( name );
+		if ( genericAttribute != null ) {
+			return genericAttribute;
+		}
+
 		if ( getSuperType() != null ) {
 			return getSuperType().findAttributeInSuperTypes( name );
 		}
