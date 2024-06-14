@@ -105,9 +105,9 @@ public class GenericEmbeddedIdentifierMappedSuperclassTest {
 			assertThat( id.getJavaType() ).isEqualTo( EmbeddableKey.class );
 			// assert that the generic attributes inside the component's model are reported as Object type
 			final SqmPathSource<?> modelPathSource = (SqmPathSource<?>) id.getModel();
-			assertThat( modelPathSource.findSubPathSource( "entity" ).getBindableJavaType() ).isEqualTo( Object.class );
+			assertThat( modelPathSource.findSubPathSource( "entity" ).getBindableJavaType() ).isEqualTo( User.class );
 			assertThat( modelPathSource.findSubPathSource( "embedded" )
-								.getBindableJavaType() ).isEqualTo( Object.class );
+								.getBindableJavaType() ).isEqualTo( UserReport.class );
 			// the serial property is not generic, so it should have the correct type even in the generic component's model
 			assertThat( modelPathSource.findSubPathSource( "serial" )
 								.getBindableJavaType() ).isEqualTo( Integer.class );
@@ -156,9 +156,9 @@ public class GenericEmbeddedIdentifierMappedSuperclassTest {
 			assertThat( id.getJavaType() ).isEqualTo( EmbeddableKey.class );
 			// assert that the generic attributes inside the component's model are reported as Object type
 			final SqmPathSource<?> modelPathSource = (SqmPathSource<?>) id.getModel();
-			assertThat( modelPathSource.findSubPathSource( "entity" ).getBindableJavaType() ).isEqualTo( Object.class );
+			assertThat( modelPathSource.findSubPathSource( "entity" ).getBindableJavaType() ).isEqualTo( Group.class );
 			assertThat( modelPathSource.findSubPathSource( "embedded" )
-								.getBindableJavaType() ).isEqualTo( Object.class );
+								.getBindableJavaType() ).isEqualTo( GroupReport.class );
 			// the serial property is not generic, so it should have the correct type even in the generic component's model
 			assertThat( modelPathSource.findSubPathSource( "serial" )
 								.getBindableJavaType() ).isEqualTo( Integer.class );

@@ -88,7 +88,7 @@ public class GenericMappedSuperclassNestedJoinTest {
 			final CriteriaQuery<Integer> cq = cb.createQuery( Integer.class );
 			final Root<SelectionProductRuleProductLink> root = cq.from( SelectionProductRuleProductLink.class );
 			final Join<SelectionProductRuleProductLink, Object> parent = root.join( "parent" );
-			assertThat( parent.getJavaType() ).isEqualTo( SeqOrderLinkObjectWithUserContext.class );
+			assertThat( parent.getJavaType() ).isEqualTo( SelectionProductRule.class );
 			assertThat( parent.getModel() ).isSameAs( root.getModel().getAttribute( "parent" ) );
 			assertThat( ( (SqmPath<?>) parent ).getResolvedModel().getBindableJavaType() )
 					.isEqualTo( SelectionProductRule.class );
@@ -115,12 +115,12 @@ public class GenericMappedSuperclassNestedJoinTest {
 			final CriteriaQuery<String> cq = cb.createQuery( String.class );
 			final Root<SelectionProductRuleProductLink> root = cq.from( SelectionProductRuleProductLink.class );
 			final Join<SelectionProductRuleProductLink, ?> p1 = root.join( "parent" );
-			assertThat( p1.getJavaType() ).isEqualTo( SeqOrderLinkObjectWithUserContext.class );
+			assertThat( p1.getJavaType() ).isEqualTo( SelectionProductRule.class );
 			assertThat( p1.getModel() ).isSameAs( root.getModel().getAttribute( "parent" ) );
 			assertThat( ( (SqmPath<?>) p1 ).getResolvedModel().getBindableJavaType() )
 					.isEqualTo( SelectionProductRule.class );
 			final Join<Object, Object> p2 = p1.join( "parent" );
-			assertThat( p2.getJavaType() ).isEqualTo( SimpleObject.class );
+			assertThat( p2.getJavaType() ).isEqualTo( Selection.class );
 			final ManagedDomainType<?> joinType = (ManagedDomainType<?>) ( (SqmPath<?>) p1 ).getReferencedPathSource()
 					.getSqmPathType();
 			assertThat( p2.getModel() ).isSameAs( joinType.getAttribute( "parent" ) );
