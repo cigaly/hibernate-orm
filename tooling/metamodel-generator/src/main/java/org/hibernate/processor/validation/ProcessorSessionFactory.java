@@ -390,7 +390,8 @@ public abstract class ProcessorSessionFactory extends MockSessionFactory {
 		@Override
 		boolean isSubclassPersister(MockEntityPersister entityPersister) {
 			EntityPersister persister = (EntityPersister) entityPersister;
-			return typeUtil.isSubtype( persister.type.asType(), type.asType() );
+			return typeUtil.isSubtype( persister.type.asType(), type.asType() )
+					&& !typeUtil.isSameType( persister.type.asType(), type.asType() );
 		}
 
 		@Override
