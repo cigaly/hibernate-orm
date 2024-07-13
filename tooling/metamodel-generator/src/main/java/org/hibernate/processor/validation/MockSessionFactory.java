@@ -806,7 +806,7 @@ public abstract class MockSessionFactory
 		@Override
 		public <X> ManagedDomainType<X> managedType(String typeName) {
 			final String entityName = findEntityName( typeName );
-			return entityName == null ? null : entity( entityName );
+			return entity( entityName == null ? typeName : entityName );
 		}
 
 		@Override
