@@ -5,6 +5,7 @@
 package org.hibernate.processor.test.innerclass;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQuery;
 import org.hibernate.processor.test.util.CompilationTest;
@@ -13,6 +14,8 @@ import org.junit.Test;
 
 import static org.hibernate.processor.test.util.TestUtil.assertMetamodelClassGeneratedFor;
 import static org.hibernate.processor.test.util.TestUtil.assertNoMetamodelClassGeneratedFor;
+import static org.hibernate.processor.test.util.TestUtil.assertPresenceOfFieldInMetamodelFor;
+import static org.hibernate.processor.test.util.TestUtil.assertPresenceOfMethodInMetamodelFor;
 import static org.hibernate.processor.test.util.TestUtil.getMetaModelSourceAsString;
 
 public class InnerClassTest extends CompilationTest {
@@ -31,6 +34,10 @@ public class InnerClassTest extends CompilationTest {
 		assertNoMetamodelClassGeneratedFor( Dummy.class );
 		assertMetamodelClassGeneratedFor( Dummy.DummyEmbeddable.class );
 		System.out.println( getMetaModelSourceAsString( Dummy.DummyEmbeddable.class ) );
+		assertMetamodelClassGeneratedFor( Dummy.ThePerson.class );
+		System.out.println( getMetaModelSourceAsString( Dummy.ThePerson.class ) );
+		assertPresenceOfFieldInMetamodelFor( Dummy.ThePerson.class, "QUERY_SELECT_THE_PERSON_NAME" );
+		assertPresenceOfMethodInMetamodelFor( Dummy.ThePerson.class, "selectThePersonName", EntityManager.class );
 	}
 
 	@Entity(name = "Inner")

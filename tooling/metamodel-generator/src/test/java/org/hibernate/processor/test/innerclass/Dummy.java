@@ -4,8 +4,10 @@
  */
 package org.hibernate.processor.test.innerclass;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.NamedQuery;
@@ -78,5 +80,23 @@ public class Dummy {
 		public abstract String getName();
 
 		public abstract void setName(String name);
+	}
+
+	@Entity(name = "The Person")
+	@NamedQuery(
+			name = "#selectThePersonName",
+			query = "select `upper`(`the person`.`name`) as `The person name` from `The Person` `the person`"
+	)
+	public static class ThePerson {
+
+		@Id
+		@GeneratedValue
+		Integer id;
+
+		@Column(name = "the name")
+		String name;
+
+		@Column
+		String surname;
 	}
 }
