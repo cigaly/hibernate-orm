@@ -66,16 +66,21 @@ import jakarta.persistence.AccessType;
 import static java.beans.Introspector.decapitalize;
 import static java.lang.Boolean.FALSE;
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static javax.lang.model.util.ElementFilter.methodsIn;
+import static org.hibernate.grammars.hql.HqlLexer.FETCH;
 import static org.hibernate.grammars.hql.HqlLexer.FROM;
 import static org.hibernate.grammars.hql.HqlLexer.GROUP;
 import static org.hibernate.grammars.hql.HqlLexer.HAVING;
+import static org.hibernate.grammars.hql.HqlLexer.LIMIT;
+import static org.hibernate.grammars.hql.HqlLexer.OFFSET;
 import static org.hibernate.grammars.hql.HqlLexer.ORDER;
 import static org.hibernate.grammars.hql.HqlLexer.WHERE;
 import static org.hibernate.internal.util.StringHelper.qualify;
 import static org.hibernate.internal.util.StringHelper.unqualify;
+import static org.hibernate.processor.annotation.AbstractQueryMethod.isJakartaCursoredPage;
 import static org.hibernate.processor.annotation.AbstractQueryMethod.isRangeParam;
 import static org.hibernate.processor.annotation.AbstractQueryMethod.isRestrictionParam;
 import static org.hibernate.processor.annotation.AbstractQueryMethod.isSessionParameter;
@@ -2379,18 +2384,22 @@ public class AnnotationMetaEntity extends AnnotationMeta {
 
 		final String[] sessionType = sessionTypeFromParameters( paramNames, paramTypes );
 		final DeclaredType resultType = resultType(method, returnType, mirror, value);
-		final List<OrderBy> orderBys =
+		List<OrderBy> orderBys =
 				resultType == null
 						? emptyList()
 						: orderByList( method, (TypeElement) resultType.asElement() );
 
-		final String processedQuery;
+		String processedQuery;
 		if (isNative) {
 			processedQuery = queryString;
 			validateSql(method, mirror, processedQuery, paramNames, value);
 		}
 		else {
 			processedQuery = addFromClauseIfNecessary( queryString, implicitEntityName(resultType) );
+			if ( !orderBys.isEmpty() && !isJakartaCursoredPage( containerTypeName ) ) {
+				processedQuery = addOrderBysIfNecessary( processedQuery, orderBys );
+				orderBys = emptyList();
+			}
 			validateHql(method, returnType, mirror, value, processedQuery, paramNames, paramTypes);
 		}
 
@@ -2523,6 +2532,32 @@ public class AnnotationMetaEntity extends AnnotationMeta {
 			}
 			return hql + " from " + entityType;
 		}
+	}
+
+	private String addOrderBysIfNecessary(String hql, List<OrderBy> orderBys) {
+		final HqlLexer hqlLexer = HqlParseTreeBuilder.INSTANCE.buildHqlLexer( hql );
+		final List<? extends Token> allTokens = hqlLexer.getAllTokens();
+		if ( allTokens.stream().anyMatch( t -> t.getType() == ORDER ) ) {
+			throw new AssertionFailure("@OrderBy can not be mixed with 'ORDER BY'" );
+		}
+		final String orderBy = orderBys.stream()
+				.map( order ->
+						(order.ignoreCase ? "lower(" : "")
+						+ order.fieldName
+						+ (order.ignoreCase ? ") " : " ")
+						+ (order.descending ? "DESC" : "ASC") )
+				.collect( joining( ", ", " ORDER BY ", "" ) );
+		for ( final Token token : allTokens ) {
+			switch ( token.getType() ) {
+				case LIMIT:
+				case OFFSET:
+				case FETCH:
+					return new StringBuilder( hql )
+							.insert( token.getStartIndex(), orderBy + " " )
+							.toString();
+			}
+		}
+		return hql + orderBy;
 	}
 
 	private @Nullable DeclaredType resultType(
