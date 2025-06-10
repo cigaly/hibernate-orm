@@ -1804,7 +1804,8 @@ public class AnnotationMetaEntity extends AnnotationMeta {
 								context.addNonnullAnnotation(),
 								lifecycleParameterKind(parameterType),
 								returnArgument,
-								hasGeneratedId(declaredType)
+								hasGeneratedId(declaredType),
+								element
 						)
 				);
 			}
